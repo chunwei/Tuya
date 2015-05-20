@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="./style/style.css" />
+    <link rel="stylesheet" href="./style/miao.css" />
+    <script src="./script/jquery-latest.js"></script>
+    <script type="text/javascript" src="./script/tinybox.js"></script>
+    <script type="text/javascript" src="./script/iscroll.js"></script>
+
+    <style>
+        html, body { height: 100%; overflow-x: hidden; }
+        body { margin: 0; font-size: 20px; font-family: "Microsoft Yahei","Source Sans Pro", helvetica, sans-serif; font-weight: 200; color: #6e6e6e; }
+        a { color: #515151; text-decoration: none; }
+        p { margin-top: 0; margin-bottom: 0; padding-top: 10px; padding-bottom: 10px; font-family: "Microsoft Yahei" }
+        h1 { font-weight: 200; }
+        ul { list-style-type: none; padding: 0; }
+        ::selection { background-color: #e77878; color: white; }
+        .wrapper { width: 100%; box-sizing: border-box; border-top: 2px solid #6c6c6c; background-color: #fefefe; }
+        .link-menu { font-size: 2.2rem; }
+        .link-menu:hover { color: #807d7d; }
+        .main-content { padding: 50px 0 30px; text-align: center; }
+        .headline { font-size: 3.6rem; font-weight: 400; }
+        .headline-main { color: #3c3c3c; }
+        .download { padding-top: 40px; }
+        .btn-download { display: inline-block; text-align: center; padding: 6px; background-color: #424242; color: white; border: 2px solid #6c6c6c; font-size: 1.2rem; }
+        .btn-download:hover { background-color: #6c6c6c; color: #ececec; border: 2px solid #424242; }
+        .sidebar { background-color: #312f2f; }
+        .sidebar li + li { margin-top: 12px; }
+        .sidebar li a { padding: 4px 10px; display: block; color: #cecece; }
+        .sidebar li a:hover { background-color: #666666; }
+        .sidebar li a.current { background-color: #8e8787; }
+        .jsc-sidebar { position: fixed; top: 0; left: 0; width: 220px; height: 100%;   overflow-y: scroll; }
+        .jsc-sidebar-content { position: relative; top: 0; left: 0; min-height: 100%; z-index: 10; background-color: #04A871; }
+        .jsc-sidebar-pulled { transition: transform 0.5s ease; -webkit-transition: -webkit-transform 0.5s ease; -moz-transition: -moz-transform 0.5s ease; -ms-transition: -ms-transform 0.5s ease; transform: translate3d(0, 0, 0); -webkit-transform: translate3d(0, 0, 0); -moz-transform: translate3d(0, 0, 0); -ms-transform: translate3d(0, 0, 0); -webkit-backface-visibility: hidden; -webkit-perspective: 1000; }
+        .jsc-sidebar-pushed { transform: translate3d(220px, 0, 0); -webkit-transform: translate3d(220px, 0, 0); -moz-transform: translate3d(220px, 0, 0); -ms-transform: translate3d(220px, 0, 0); }
+        .jsc-sidebar-scroll-disabled { position: fixed; overflow: hidden; }
+    </style>
+    <title>涂鸦板</title>
+</head>
+<body>
+
+<div class="wrapper jsc-sidebar-content jsc-sidebar-pulled">
+    <span class="icon-open">
+        <a href="#" class="icon-menu link-menu jsc-sidebar-trigger">三</a>
+    </span>
+    <div class="tips">
+        <div id="tips_right"><h1>涂鸦</h1></div>
+        <!--    <a  href="piclist.php" class="button_wrap" ><div id="tips_right" class="button">围观作品</div></a>-->
+    </div>
+
+    <div id="sketch-wrap">
+        <div id="canvas"></div>
+    </div>
+    <div class="tools" ></div>
+    <div class="tools" style="margin:0 0 1px;">
+        <a href="#colors_sketch" data-clear='true' style=" width: 50px;" class="button_wrap" id="chongxinhua"><div class="button">重新画</div></a>
+        <a href="#colors_sketch" data-cancel='true' style=" width: 60px;" class="button_wrap" id="shangyibu"><div class="button">后悔药</div></a>
+        <a href="#colors_sketch" data-preview="png" class="button_wrap" ><div id="preview" class="button">预览</div></a>
+        <a href="#colors_sketch" data-download="png" class="button_wrap" ><div id="xiazai" class="button">下载</div></a>
+        <a onclick="confirm()" class="button_wrap" ><div id="tijiao" class="button">上传</div></a>
+        <a onclick="getpic()" class="button_wrap" ><div id="getpic" class="button">回放</div></a>
+        <a class="button_wrap" ><div class="button changeBP">换底图</div>
+            <input type="file" accept="image/*;capture=camera" id="imagePicker" name="imagePicker" style="display: none">
+        </a>
+        <a href="#colors_sketch" data-showbp='true' class="button_wrap" ><div id="BPTrigger" showbp=true class="button BPTrigger">隐藏底图</div></a>
+        <!--    <a href="http://mp.weixin.qq.com/s?__biz=MzA4NTA3NTMzMA==&mid=200883099&idx=1&sn=1dbebaf4a240378c097e7a78696d5022%23rd"><div id="chakan" class="button">分享</div></a>-->
+    </div>
+    <h2>如遇画布消失或未满屏，可尝试刷新本页面</h2>
+</div>
+
+<div class="sidebar jsc-sidebar" id="jsi-nav">
+
+        <div id="pic-list"></div>
+
+</div>
+
+
+
+<script type="text/javascript" src="./script/main.js"></script>
+
+<script type="text/javascript">
+    $(function() {
+        // <a href="#colors_sketch" data-color="#f00" class="color-dot" style="display: inline-block;width: 20px;height:20px; background: #f00;"></a>
+        $('body .tools').first().prepend("<div class='color-picker'></div>");
+        $.each(["#000000", "#555555", "#999999", "#0a67a3", "#3e97d1", "#8ec9ef", "#ff0000", "#f56c36", "#f8a881", "#407f1a", "#7ed616", "#ddec38", "#a15f9d", "#f580e3", "#ffff00", "#8a5025", "#ef934d", "#ffffff"], function() {
+            $('.tools .color-picker').first().append("<a href='#colors_sketch' data-color='" + this + "' class='color-dot' style='display: inline-block;width: 20px;height:20px; background: " + this + ";'></a> ");
+        });
+        $('body .tools').first().prepend("<div class='size-picker'></div>");
+        $.each([0.5,1.1, 3, 5, 10, 15], function() {
+            $('.tools .size-picker').first().append("<a href='#colors_sketch' data-size='" + this + "' class='size-dot' ><span  style='display: inline-block;width: "+Math.ceil(this)+"px;height:"+Math.ceil(this)+"px;'></span></a> ");
+        });
+    });
+</script>
+
+<script type="text/javascript">
+
+
+
+
+
+    //画板部分
+    function ready()
+    {
+
+        // 插入画布
+        // if(window.innerHeight==0)window.location.reload();
+        //加载画布js，初始化
+
+        $.getScript("./script/sketch.js", function(){
+            $(function() {
+                // var insertText = "<canvas id='colors_sketch' width='"+(window.innerWidth-38)+"px' height='"+(window.innerHeight-170)+"px'></canvas>";
+                //document.getElementById("canvas").innerHTML = insertText;
+                $('#sketch-wrap').innerHeight(window.innerHeight-280);
+                $("#canvas").html("<canvas id='colors_sketch' width='"+($('#sketch-wrap').innerWidth()-2)+"px' height='"+($('#sketch-wrap').innerHeight()-2)+"px'></canvas>");
+                $('#colors_sketch').sketch();
+
+
+            });
+        });
+
+
+        //加载图片列表
+        getPicList();
+    }
+    window.onload=ready;
+
+
+</script>
+
+
+
+
+
+<script src="./script/sidebar.js"></script>
+<script>
+var piclistSidebar=$('#jsi-nav').sidebar({
+    trigger: '.jsc-sidebar-trigger',
+    scrollbarDisplay:true,
+    pullCb:replayPic,//侧栏导航收回后的回调函数
+    pushCb:getPicList  //侧栏导航展开后的回调函数
+});
+function pullmeBack(){
+    var picnum=$(event.target).attr('picnum');
+    updatePicnumCookie(picnum);
+    piclistSidebar.pull();
+}
+    function replayPic(){
+        //piclistSidebar.pull();
+        getpic();
+    }
+    function updatePicnumCookie(picnum){
+        var Day = 20;
+        //  var Min = 60;
+        var exp = new Date();
+        exp.setTime(exp.getTime() + Day*24*60*60*1000);
+        document.cookie="picnum="+picnum+";expires=" + exp.toGMTString();
+    }
+</script>
+
+
+
+</body>
+</html>

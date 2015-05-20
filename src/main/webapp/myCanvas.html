@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<canvas id="myCanvas" width="300" height="400"></canvas>
+<img class="grayscale" src="pic.jpg" alt="Description of my picture" />
+<script>
+    var myCanvas=document.getElementById('myCanvas');
+    var ctx=myCanvas.getContext("2d");
+    ctx.beginPath();
+    ctx.moveTo(10,10);
+    ctx.lineTo(20,20);
+    ctx.bezierCurveTo(20,25,60,10,100,120);
+    ctx.lineCap='round';
+    ctx.lineWidth=5;
+    ctx.strokeStyle ='red';
+    ctx.stroke();
+    ctx.fillStyle='#ccffcc';
+    ctx.fill();
+    ctx.closePath();
+
+    ctx.beginPath();
+    ctx.moveTo(5,5);
+    ctx.lineTo(5,180);
+    ctx.strokeStyle ='rgba(255,0,0,0.5)';
+    ctx.stroke();
+    ctx.closePath();
+
+    var x = myCanvas.width / 2;
+    var y = myCanvas.height / 2 - 10;
+    var text = 'Hello World!';
+
+    ctx.beginPath();
+    ctx.font = '30pt Calibri';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'lightblue';
+    ctx.fillText(text, x, y);
+    ctx.lineWidth=1;
+    ctx.strokeStyle ='blue';
+    ctx.strokeText(text, x, y);
+
+    // get text metrics
+    var metrics = ctx.measureText(text);
+    var width = metrics.width;
+    ctx.font = '15pt Calibri';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#555';
+    ctx.fillText('(' + width + 'px wide)', x, y + 40);
+
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.lineTo(150,50);
+    ctx.lineTo(20,100);
+
+    var grd = ctx.createLinearGradient(0,0,170,0);  //定义线性渐变对象，设定渐变线起始点和结束点坐标，坐标格式为(起始点x,起始点y,结束点x,结束点y)
+    grd.addColorStop(0,"black");   //定义渐变线起点颜色
+    grd.addColorStop(0.5,"red");   //定义渐变线中间点的颜色
+    grd.addColorStop(1,"yellow");  //定义渐变线结束点的颜色
+    ctx.lineWidth=5;
+    ctx.strokeStyle = grd;   //将渐变对象赋值给strokeStyle
+    ctx.stroke();  //描边
+
+    var pic = new Image();   //创建图片对象，或者 pic = document.createElement(‘img‘)
+    pic.onload = patternFill;     //在图片加载完成时执行绘图函数
+    pic.src = "pic.jpg";
+
+    function patternFill() {     //定义绘图函数
+        var redTexture = ctx.createPattern(pic, "repeat");
+        ctx.strokeStyle = redTexture;
+    ctx.beginPath();
+        ctx.moveTo(80,10);
+        ctx.lineTo(10,90);
+        ctx.lineTo(100,190);
+        ctx.lineTo(200,90);
+        ctx.lineWidth = 8;    //定义线段粗度为8像素
+        ctx.stroke();
+    ctx.closePath();
+    }
+
+
+    ctx.lineWidth = 2;
+    ctx.moveTo(12.5,200+12.5);
+    for (var i=0;i<6;i++){
+        for (var j=0;j<6;j++){
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgb(0,' + Math.floor(255-42.5*i) + ',' + Math.floor(255-42.5*j) + ')';
+            ctx.arc(12.5+j*25,200+12.5+i*25,10,0,Math.PI*2,true);
+            ctx.stroke();
+        }
+    }
+    ctx.save();
+
+    // draw background
+    ctx.fillStyle = '#FD0';
+    ctx.fillRect(120+0,0,75,75);
+    ctx.fillStyle = '#6C0';
+    ctx.fillRect(120+75,0,75,75);
+    ctx.fillStyle = '#09F';
+    ctx.fillRect(120+0,75,75,75);
+    ctx.fillStyle = '#F30';
+    ctx.fillRect(120+75,75,75,75);
+    ctx.fillStyle = '#FFF';
+    ctx.globalAlpha = 0.2;
+    // Draw semi transparent circles
+    for (var i=0;i<7;i++){
+        ctx.beginPath();
+        ctx.arc(120+75,75,10+10*i,0,Math.PI*2,true);
+        ctx.fill();
+    }
+
+    ctx.restore();
+
+    var dataUrl=myCanvas.toDataURL('image/png');
+    window.console.log(dataUrl.length);
+    window.console.log(dataUrl);
+    var img1=new Image();
+    img1.src=dataUrl;
+    img1.className="grayscale";
+    document.body.appendChild(img1);
+
+    dataUrl=myCanvas.toDataURL('image/jpeg');
+    window.console.log(dataUrl.length);
+    window.console.log(dataUrl);
+    var img2=new Image();
+    img2.src=dataUrl;
+    document.body.appendChild(img2);
+
+</script>
+
+<script>
+
+    window.addEventListener("load", removeColors);
+
+    function showColorImg() {
+        this.style.display = "none";
+        this.nextSibling.style.display = "inline";
+    }
+
+    function showGrayImg() {
+        this.previousSibling.style.display = "inline";
+        this.style.display = "none";
+    }
+
+    function removeColors() {
+        var aImages = document.getElementsByClassName("grayscale"),
+                nImgsLen = aImages.length,
+                oCanvas = document.createElement("canvas"),
+                oCtx = oCanvas.getContext("2d");
+        for (var nWidth, nHeight, oImgData, oGrayImg, nPixel, aPix, nPixLen, nImgId = 0; nImgId < nImgsLen; nImgId++) {
+            oColorImg = aImages[nImgId];
+            nWidth = oColorImg.offsetWidth;
+            nHeight = oColorImg.offsetHeight;
+            oCanvas.width = nWidth;
+            oCanvas.height = nHeight;
+            oCtx.drawImage(oColorImg, 0, 0);
+            oImgData = oCtx.getImageData(0, 0, nWidth, nHeight);
+            aPix = oImgData.data;
+            nPixLen = aPix.length;
+            for (nPixel = 0; nPixel < nPixLen; nPixel += 4) {
+                aPix[nPixel + 2] = aPix[nPixel + 1] = aPix[nPixel] = (aPix[nPixel] + aPix[nPixel + 1] + aPix[nPixel + 2]) / 3;
+            }
+            oCtx.putImageData(oImgData, 0, 0);
+            oGrayImg = new Image();
+            oGrayImg.src = oCanvas.toDataURL();
+            oGrayImg.onmouseover = showColorImg;
+            oColorImg.onmouseout = showGrayImg;
+            oCtx.clearRect(0, 0, nWidth, nHeight);
+            oColorImg.style.display = "none";
+            oColorImg.parentNode.insertBefore(oGrayImg, oColorImg);
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 2013-10-22 15:28:34 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+ <class name="cn.flipme.bean.ApiUserInfo" schema="travel_db" table="token_user">
+  <id column="scode" name="scode" type="string" length="20">
+  	<generator class="assigned"></generator>
+  </id>
+  <property generated="never" lazy="false" name="username" type="string">
+   <column length="100" name="nameCn" sql-type="VARCHAR"/>
+  </property>
+  <property generated="never" lazy="false" name="phone" type="string">
+   <column length="100" name="contacts" sql-type="VARCHAR"/>
+  </property>
+  <property generated="never" lazy="false" name="email" type="string">
+   <column length="100" name="email" sql-type="VARCHAR"/>
+  </property>
+<!--   <property generated="never" lazy="false" name="scode" type="string">
+   <column length="20" name="scode" sql-type="VARCHAR"/>
+  </property> -->
+  <property generated="never" lazy="false" name="unit" type="string">
+   <column length="200" name="unit" sql-type="VARCHAR"/>
+  </property>
+  <property generated="never" lazy="false" name="postscript" type="string">
+   <column length="2000" name="postscript" sql-type="VARCHAR"/>
+  </property>
+ </class>
+</hibernate-mapping>

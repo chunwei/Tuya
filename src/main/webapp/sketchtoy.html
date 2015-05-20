@@ -1,0 +1,214 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="utf-8">
+
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+        <meta name="description" content="A drawing application that lets you save and share replays of your work with friends." />
+        <meta name="author" content="Hakim El Hattab" />
+
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="viewport" content="width=1024, user-scalable=no" />
+
+        <meta property="fb:admins" content="726190751" />
+        <meta property="fb:app_id" content="433337680065765" />
+
+        <meta property="og:image" content="http://d1835mevib0k1p.cloudfront.net/sketch/icon-200.png" />
+        <meta property="og:title" content="Sketch Toy" />
+        <meta property="og:description" content="Draw sketches and share replays with friends!" />
+
+
+        <title>Sketch Toy: Draw sketches and share replays with friends!</title>
+
+        <link href="./style/sketch.min.css" rel="stylesheet" media="screen" />
+
+        <script>
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-36691274-1']);
+            _gaq.push(['_trackPageview']);
+
+            (function() {
+                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+            })();
+        </script>
+
+    </head>
+
+    <body>
+
+    <div class="main-container">
+
+
+        <div class="toolbar">
+            <div class="btn new-button green" title="New sketch" name="new-button">New</div>
+            <div class="btn save-button green" title="Save the sketch" name="save-button">Save</div>
+
+            <div class="divider"></div>
+
+            <div class="btn undo-button" title="Undo last action" name="undo-button">Undo</div>
+            <div class="btn eraser-toggle" title="Eraser" name="eraser-toggle">Eraser</div>
+
+            <div class="dropdown size-dropdown">
+                <div class="btn dropdown-title"><span class="label">Size:</span> <span class="value"></span></div>
+                <div class="dropdown-list">
+                    <ul class="dropdown-list-inner">
+                        <li><div class="dropdown-item" data-value="0.5" class="small"><span style="width: 1px; height: 1px;"></span></div></li>
+                        <li><div class="dropdown-item" data-value="1" class="small"><span style="width: 2px; height: 2px;"></span></div></li>
+                        <li><div class="dropdown-item" data-value="2" class="small"><span style="width: 3px; height: 3px;"></span></div></li>
+                        <li><div class="dropdown-item" data-value="3" class="small"><span style="width: 4px; height: 4px;"></span></div></li>
+                        <li><div class="dropdown-item" data-value="4"><span style="width: 6px; height: 6px;"></span></div></li>
+                        <li><div class="dropdown-item" data-value="5"><span style="width: 8px; height: 8px;"></span></div></li>
+                        <li><div class="dropdown-item" data-value="7"><span style="width: 10px; height: 10px;"></span></div></li>
+                        <li><div class="dropdown-item" data-value="9"><span style="width: 12px; height: 12px;"></span></div></li>
+                        <li><div class="dropdown-item" data-value="16"><span style="width: 16px; height: 16px;"></span></div></li>
+                        <li><div class="dropdown-item" data-value="32" class="large"><span style="width: 28px; height: 28px;"></span></div></li>
+                        <li><div class="dropdown-item" data-value="64" class="xlarge"><span style="width: 50px; height: 50px;"></span></div></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="dropdown vibration-dropdown">
+                <div class="btn dropdown-title"><span class="label">Vibration:</span> <span class="value"></span></div>
+                <div class="dropdown-list auto-width">
+                    <ul class="dropdown-list-inner">
+                        <li><div class="dropdown-item" data-value="0">0</div></li>
+                        <li><div class="dropdown-item" data-value="1">1</div></li>
+                        <li><div class="dropdown-item" data-value="2">2</div></li>
+                        <li><div class="dropdown-item" data-value="3">3</div></li>
+                        <li><div class="dropdown-item" data-value="5">5</div></li>
+                        <li><div class="dropdown-item" data-value="10">10</div></li>
+                        <li><div class="dropdown-item" data-value="20">20</div></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="dropdown color-dropdown">
+                <div class="btn dropdown-title"><span class="label"></span> <span class="value"></span></div>
+                <div class="dropdown-list">
+                    <ul class="dropdown-list-inner">
+                        <li><div class="dropdown-item" data-value="#000000" style="background: #000000;">&nbsp;</div></li>
+                        <li><div class="dropdown-item" data-value="#555555" style="background: #555555;">&nbsp;</div></li>
+                        <li><div class="dropdown-item" data-value="#999999" style="background: #999999;">&nbsp;</div></li>
+                        <li><div class="dropdown-item" data-value="#0a67a3" style="background: #0a67a3;">&nbsp;</div></li>
+                        <li><div class="dropdown-item" data-value="#3e97d1" style="background: #3e97d1;">&nbsp;</div></li>
+                        <li><div class="dropdown-item" data-value="#8ec9ef" style="background: #8ec9ef;">&nbsp;</div></li>
+                        <li><div class="dropdown-item" data-value="#ff0000" style="background: #ff0000;">&nbsp;</div></li>
+                        <li><div class="dropdown-item" data-value="#f56c36" style="background: #f56c36;">&nbsp;</div></li>
+                        <li><div class="dropdown-item" data-value="#f8a881" style="background: #f8a881;">&nbsp;</div></li>
+                        <li><div class="dropdown-item" data-value="#407f1a" style="background: #407f1a;">&nbsp;</div></li>
+                        <li><div class="dropdown-item" data-value="#7ed616" style="background: #7ed616;">&nbsp;</div></li>
+                        <li><div class="dropdown-item" data-value="#ddec38" style="background: #ddec38;">&nbsp;</div></li>
+                        <li><div class="dropdown-item" data-value="#a15f9d" style="background: #a15f9d;">&nbsp;</div></li>
+                        <li><div class="dropdown-item" data-value="#f580e3" style="background: #f580e3;">&nbsp;</div></li>
+                        <li><div class="dropdown-item" data-value="#ffff00" style="background: #ffff00;">&nbsp;</div></li>
+                        <li><div class="dropdown-item" data-value="#8a5025" style="background: #8a5025;">&nbsp;</div></li>
+                        <li><div class="dropdown-item" data-value="#ef934d" style="background: #ef934d;">&nbsp;</div></li>
+                        <li><div class="dropdown-item" data-value="#ffffff" style="background: #ffffff;">&nbsp;</div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <br>
+
+        <div class="share-overlay">
+            <div class="inner">
+                <a class="close" href="#"></a>
+                <div class="url">
+                    <p class="label">Link:</p>
+                    <input type="text" readonly value="" />
+                </div>
+                <div class="share">
+                    <a class="share-facebook" href="#"><span class="label">Share</span> <span class="icon"></span></a>
+                    <a class="share-facebook-message" href="#"><span class="label">Send Message</span> <span class="icon"></span></a>
+                    <!-- <a class="share-facebook-photo" href="#"><span class="label">Upload Photo</span> <span class="icon"></span></a> -->
+                    <a class="share-twitter" href="#"><span class="label">Tweet</span> <span class="icon"></span></a>
+                    <a class="share-email" href="#"><span class="label">Email</span> <span class="icon"></span></a>
+                    <a class="share-download" href="#"><span class="label">Download Image</span> <span class="icon"></span></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading-overlay">
+            <div class="inner">
+                <div class="status"></div>
+                <div class="message"></div>
+            </div>
+        </div>
+
+        <div id="spinner"></div>
+
+        <div class="sketch-canvas-wrapper">
+
+
+            <div class="sketch-canvas-container">
+                <canvas class="sketch-canvas">
+                    <p class="noCanvas">You need a <a href="http://www.google.com/chrome">modern browser</a> to view this.</p>
+                </canvas>
+                <div class="replay-controls">
+                    <div class="progress"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="related">
+            <div class="related-gallery"></div>
+        </div>
+
+    </div>
+
+    <footer>
+        <div class="left">
+            <section>
+                <h3>What is this?</h3>
+                <p>
+                    Sketch Toy is a free online drawing application that lets you share
+                    step-by-step replays of your work with friends. No sign up needed.
+                </p>
+                <a class="chrome-app-link" href="https://chrome.google.com/webstore/detail/sketch-toy/ednofnkligfbacmlfggaccfhpkfopojb" target="_blank">
+                    Get the Sketch Toy app for Google Chrome
+                </a>
+            </section>
+        </div>
+
+        <div class="right">
+            <section>
+                <h3>Controls</h3>
+                <p>
+                    CTRL+Z to undo, CTRL+E to toggle eraser.
+                </p>
+                <p>
+                    Left/right keyboard arrows to rotate in 3D.
+                </p>
+                <p>
+                    Drag an image from your desktop onto the canvas to draw a stencil.
+                </p>
+            </section>
+        </div>
+
+        <p class="links">
+            <a href="http://hakim.se/">&copy; 2015 Hakim El Hattab</a> &mdash;
+            <a href="/terms" class="terms">Terms of Service</a> &mdash;
+            <a href="/privacy" class="privacy">Privacy Policy</a> &mdash;
+            <a href="http://facebook.com/sketchtoy">Facebook</a> &mdash;
+            <a href="http://twitter.com/sketchtoy">Twitter</a> &mdash;
+            <a href="https://plus.google.com/+SketchToyApp">Google+</a> &mdash;
+            <a href="http://sketch-toy.tumblr.com">Tumblr</a>
+        </p>
+    </footer>
+
+    <script>
+        var SketchConfig = {
+            autodetectLanguage: false
+        };
+    </script>
+    <script src="./script/jquery-latest.js"></script>
+    <script src="./script/sketch.min.js"></script>
+
+
+    </body>
+    </html>

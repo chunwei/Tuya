@@ -1,0 +1,704 @@
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="/style/style.css" />
+    <link rel="stylesheet" href="/style/miao_list.css" />
+    <script src="/script/jquery-latest.js"></script>
+    <script type="text/javascript" src="/script/tinybox.js"></script>
+    <script type="text/javascript" src="/script/iscroll.js"></script>
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript">
+        var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+        document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F026dc3ba91f887841813c1c2ddf7b7b3' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+        //微信配置部分
+        wx.config({
+            debug: false,
+            appId: 'wx3e7b53d475fc18c4',
+            timestamp: 1431157501,
+            nonceStr: 'HPrZ37YIlXf9hKom',
+            signature: 'beeeb076e814cc934545748e114ba82756f7dcd6',
+            jsApiList: [
+                'onMenuShareTimeline',
+                'onMenuShareAppMessage'
+            ]
+        });
+
+        page_no=2;//页面编号
+        gfile=0;//初始数据
+        DataReload = false;//数据重载指令
+
+        //全局变量方便调用
+        wxSharedData = {
+            "appId": "wx3e7b53d475fc18c4",
+            "imgUrl" : "http://miaoa.life-fun.cn/miao_logo.jpg",
+            "link" : 'http://lifefunmiao.sinaapp.com/XKO76Yc',
+            "desc" : '你的创造\n贡献无穷能量！\nLIFE-FUN',
+            "title" : "这里好多画喵大神！快来一起完成<十万喵星人计划>！"
+        };
+
+        // 关掉浮窗时取消分享状态
+        function clearpicnum(){
+            wxSharedData.imgUrl = "http://miaoa.life-fun.cn/miao_logo.jpg";
+            wxSharedData.link = "http://lifefunmiao.sinaapp.com/mWkHIF7";
+            wxSharedData.title = '这里好多画喵大神！快来一起完成<十万喵星人计划>！';
+            DataReload = false;//关闭数据重载
+            gfile=0;
+            //官方分享接口
+            wx.ready(function(){
+                wx.onMenuShareAppMessage({
+                    title: DataReload?new_title:wxSharedData.title,
+                    desc: wxSharedData.desc,
+                    link: DataReload?new_link:wxSharedData.link,
+                    imgUrl: DataReload?new_imgUrl:wxSharedData.imgUrl,
+                    trigger: function (res) {
+                        //alert('用户点击发送给朋友');
+                    },
+                    success: function (res) {
+                        //alert('已分享');
+                        $.ajax({
+                            type: "post",
+                            url: "function/sharedata.php",
+                            data: {
+                                picnum: getCookie("picnum")>0?getCookie("picnum"):-1,
+                                mode:2,
+                                IndexOrPiclist:page_no,
+                                targetpic:gfile
+                            }
+                        });
+                        DataReload = false;//关闭数据重载
+                    },
+                    cancel: function (res) {
+                        //alert('已取消');
+                    },
+                    fail: function (res) {
+                        //alert(JSON.stringify(res));
+                    }
+                });
+                wx.onMenuShareTimeline({
+                    title: DataReload?new_title:wxSharedData.title,
+                    desc: wxSharedData.desc,
+                    link: DataReload?new_link:wxSharedData.link,
+                    imgUrl: DataReload?new_imgUrl:wxSharedData.imgUrl,
+                    trigger: function (res) {
+                        //alert('用户点击分享到朋友圈');
+                    },
+                    success: function (res) {
+                        //alert('已分享');
+                        $.ajax({
+                            type: "post",
+                            url: "function/sharedata.php",
+                            data: {
+                                picnum: getCookie("picnum")>0?getCookie("picnum"):-1,
+                                mode:1,
+                                IndexOrPiclist:page_no,
+                                targetpic:gfile
+                            }
+                        });
+                        DataReload = false;//关闭数据重载
+                    },
+                    cancel: function (res) {
+                        //alert('已取消');
+                    },
+                    fail: function (res) {
+                        //alert(JSON.stringify(res));
+                    }
+                });
+            });
+        }
+
+        //点赞
+        gfile='353996';
+
+        function zoom(file){
+            gfile=file;
+            var name = document.getElementById("name" + file).innerHTML;
+            var zan = document.getElementById("zan" + file).innerHTML;
+            var src = "http://miaoa.life-fun.cn/nya/" + file + ".png";
+            var obj = new Image();
+            obj.src = src;
+            obj.onload = function() {
+                $("#toptips").css("display", "block");
+                $("#righttips").css("display", "block");
+                $("#bigpic").attr("src",src);
+                $("#biginfo").html("NO." + file + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;作者:" + name + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;赞:<span id='" + file + "'>" + zan + "</span>");
+                $("#huise").css("display","block");
+                myScroll.scrollTo(0,0);
+                $('#conment-box').empty();
+                GetConment(file);
+                $("#huise").css("visibility","visible");
+                var picnum = getCookie("picnum");
+                DataReload = true;//数据重载指令
+                new_imgUrl = "http://miaoa.life-fun.cn/nya/" + file + ".png";
+                new_link = "http://lifefunmiao.sinaapp.com/SF8NJeN?picnum=" + file;
+                if (picnum == file) {
+                    new_title = "这是我画的喵星人！快来一起完成<十万喵星人计划>！";
+                } else new_title = "' " + name + " ' 画的喵星人好棒！快来一起完成<十万喵星人计划>！";
+                //设置toptips/righttips可见
+                //官方分享接口
+                wx.ready(function(){
+                    wx.onMenuShareAppMessage({
+                        title: DataReload?new_title:wxSharedData.title,
+                        desc: wxSharedData.desc,
+                        link: DataReload?new_link:wxSharedData.link,
+                        imgUrl: DataReload?new_imgUrl:wxSharedData.imgUrl,
+                        trigger: function (res) {
+                            //alert('用户点击发送给朋友');
+                        },
+                        success: function (res) {
+                            //alert('已分享');
+                            $.ajax({
+                                type: "post",
+                                url: "function/sharedata.php",
+                                data: {
+                                    picnum: getCookie("picnum")>0?getCookie("picnum"):-1,
+                                    mode:2,
+                                    IndexOrPiclist:page_no,
+                                    targetpic:gfile
+                                }
+                            });
+                            DataReload = false;//关闭数据重载
+                        },
+                        cancel: function (res) {
+                            //alert('已取消');
+                        },
+                        fail: function (res) {
+                            //alert(JSON.stringify(res));
+                        }
+                    });
+                    wx.onMenuShareTimeline({
+                        title: DataReload?new_title:wxSharedData.title,
+                        desc: wxSharedData.desc,
+                        link: DataReload?new_link:wxSharedData.link,
+                        imgUrl: DataReload?new_imgUrl:wxSharedData.imgUrl,
+                        trigger: function (res) {
+                            //alert('用户点击分享到朋友圈');
+                        },
+                        success: function (res) {
+                            //alert('已分享');
+                            $.ajax({
+                                type: "post",
+                                url: "function/sharedata.php",
+                                data: {
+                                    picnum: getCookie("picnum")>0?getCookie("picnum"):-1,
+                                    mode:1,
+                                    IndexOrPiclist:page_no,
+                                    targetpic:gfile
+                                }
+                            });
+                            DataReload = false;//关闭数据重载
+                        },
+                        cancel: function (res) {
+                            //alert('已取消');
+                        },
+                        fail: function (res) {
+                            //alert(JSON.stringify(res));
+                        }
+                    });
+                });
+            }
+        }
+
+        function zooms(file) {
+            gfile=file;
+            $.ajax({
+                type: "get",
+                url: "/function/selectpic.php",
+                data: {
+                    picnum: file
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if(data==false) {
+                        TINY.box.show({html:"<div style='text-align: center;' >作品不存在!<div>",animate:true,close:false,boxid:"success",autohide:2});
+                        return ;
+                    }
+                    var name = data.name;
+                    var zan = data.zan;
+                    var src = "http://miaoa.life-fun.cn/nya/" + file + ".png";
+                    var obj = new Image();
+                    obj.src = src;
+                    obj.onload = function() {
+                        $("#toptips").css("display", "block");
+                        $("#righttips").css("display", "block");
+                        //TINY.box.show({html:"<div style='text-align: center;' >查询成功!<div>",animate:true,close:false,boxid:"success",autohide:0.5});
+                        $("#bigpic").attr("src", src);
+                        $("#biginfo").html("NO." + file + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;作者:" + name + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;赞:<span id='" + file + "'>" + zan + "</span>");
+                        $("#huise").css("display", "block");
+                        myScroll.scrollTo(0, 0);
+                        $('#conment-box').empty();
+                        GetConment(file);
+                        $("#huise").css("visibility", "visible");
+                        var picnum = getCookie("picnum");
+                        wxSharedData.imgUrl = "http://miaoa.life-fun.cn/nya/" + file + ".png";
+                        if (picnum == file) {
+                            wxSharedData.title = "这是我画的喵星人！快来一起完成<十万喵星人计划>！";
+                        } else wxSharedData.title = "' " + name + " ' 画的喵星人好棒！快来一起完成<十万喵星人计划>！";
+                        wxSharedData.link = "http://lifefunmiao.sinaapp.com/JmIbtdH?picnum=" + file;
+                        //官方分享接口
+                        wx.ready(function(){
+                            wx.onMenuShareAppMessage({
+                                title: DataReload?new_title:wxSharedData.title,
+                                desc: wxSharedData.desc,
+                                link: DataReload?new_link:wxSharedData.link,
+                                imgUrl: DataReload?new_imgUrl:wxSharedData.imgUrl,
+                                trigger: function (res) {
+                                    //alert('用户点击发送给朋友');
+                                },
+                                success: function (res) {
+                                    //alert('已分享');
+                                    $.ajax({
+                                        type: "post",
+                                        url: "function/sharedata.php",
+                                        data: {
+                                            picnum: getCookie("picnum")>0?getCookie("picnum"):-1,
+                                            mode:2,
+                                            IndexOrPiclist:page_no,
+                                            targetpic:gfile
+                                        }
+                                    });
+                                    DataReload = false;//关闭数据重载
+                                },
+                                cancel: function (res) {
+                                    //alert('已取消');
+                                },
+                                fail: function (res) {
+                                    //alert(JSON.stringify(res));
+                                }
+                            });
+                            wx.onMenuShareTimeline({
+                                title: DataReload?new_title:wxSharedData.title,
+                                desc: wxSharedData.desc,
+                                link: DataReload?new_link:wxSharedData.link,
+                                imgUrl: DataReload?new_imgUrl:wxSharedData.imgUrl,
+                                trigger: function (res) {
+                                    //alert('用户点击分享到朋友圈');
+                                },
+                                success: function (res) {
+                                    //alert('已分享');
+                                    $.ajax({
+                                        type: "post",
+                                        url: "function/sharedata.php",
+                                        data: {
+                                            picnum: getCookie("picnum")>0?getCookie("picnum"):-1,
+                                            mode:1,
+                                            IndexOrPiclist:page_no,
+                                            targetpic:gfile
+                                        }
+                                    });
+                                    DataReload = false;//关闭数据重载
+                                },
+                                cancel: function (res) {
+                                    //alert('已取消');
+                                },
+                                fail: function (res) {
+                                    //alert(JSON.stringify(res));
+                                }
+                            });
+                        });
+                        //设置toptips/righttips可见
+                    }
+                }
+            });
+        }
+
+        function showmine() {
+            var file = getCookie("picnum");
+            if (!file){
+                TINY.box.show({html:"你好像还没画吧！<br>（╯｀□′）╯╧╧  ",boxid:"success"});
+            }else{
+                var pic_obj = document.getElementById("pic" + file);
+                if(pic_obj) zoom(file);
+                else zooms(file);
+            };
+        }
+
+        var picstorage="http://miaoa.life-fun.cn/nya/";
+        var picdata;
+        var piclength=0;
+        var num_cnt = new Array();
+
+        var myScroll;
+        function ready()
+        {
+            gfile=getCookie("picnum")>0?getCookie("picnum"):0;
+            myScroll = new IScroll('#card', {
+                mouseWheel: true,
+                scrollbars: false
+            });
+            var picnum = getCookie("picnum");
+            if (picnum != 0 && picnum!=null) {
+                wxSharedData.imgUrl = "http://miaoa.life-fun.cn/nya/" + picnum + ".png";
+                wxSharedData.title = "这是我画的喵星人！快来一起完成<十万喵星人计划>！";
+                wxSharedData.link = "http://lifefunmiao.sinaapp.com/mz2JJgg?picnum=" + picnum;
+            }
+            var $_GET = (function() {
+                var url = window.document.location.href.toString();
+                var u = url.split("?");
+                if (typeof(u[1]) == "string") {
+                    u = u[1].split("&");
+                    var get = {};
+                    for (var i in u) {
+                        var j = u[i].split("=");
+                        get[j[0]] = j[1];
+                    }
+                    return get;
+                } else {
+                    return {};
+                }
+            })();
+            if ($_GET['picnum']) {
+                //alert("a"+$_GET['picnum']+"b");
+                var obj = new Image();
+                obj.src = "http://miaoa.life-fun.cn/nya/" + $_GET['picnum'] + ".png";
+                obj.onload = function() {
+                    zooms($_GET['picnum']);
+                }
+            }
+            changerank(1);
+        }
+        window.onload=ready;
+
+        var range = 50;
+        var elemt = 500;
+        var maxnum = 20;
+        var num;
+        var numtemp;
+        var totalheight = 0;
+        var ispost=false;
+
+        $(window).scroll(function() {
+            // $(window).scrollTop(0);
+            var srollPos = $(window).scrollTop();
+            totalheight = parseFloat($(window).height()) + parseFloat(srollPos);
+            if (($(document).height() - range) <= totalheight) {
+                if(ispost)
+                {
+                    return;
+                }
+                ispost=true;
+                var main = document.getElementById("main");
+                piclength = 0;
+                num_cnt = new Array();
+                $.ajax({
+                    type: 'GET',
+                    url: "getpic.php",
+                    data: {
+                        rank_mode: rank_mode,
+                        p_picnum: p_picnum,
+                        p_zan: p_zan,
+                        limit: limit
+                    },
+                    success: function(data) {
+                        picdata = eval("(" + data + ")");
+                        // alert(picdata.name.n1);
+                        for (var o in picdata) {
+                            piclength++;
+                            num_cnt.push(o);
+                        }
+                        num = piclength;
+                        for (var i = 0; num > 0; i++) {
+                            if (i % 3 == 0) {
+                                var item3 = document.createElement("div");
+                                item3.className = "item3";
+                                main.appendChild(item3);
+                            }
+                            var cnt = limit - num;
+                            var picnum = num_cnt[cnt].replace("n", "");
+                            var picbox = document.createElement("div");
+                            picbox.className = "picbox";
+                            picbox.innerHTML = "<p>NO.<strong>" + picnum + "</strong>&nbsp;&nbsp;&nbsp;赞:<strong><span id='zan" + picnum + "'>" + picdata[num_cnt[cnt]].zan + "</span></strong></p>";
+                            picbox.innerHTML += "<p>作者:<strong><span id='name" + picnum + "'>" + picdata[num_cnt[cnt]].name + "</span></strong></p>";
+                            picbox.innerHTML += "<img id='pic" + picnum + "' class='pic' src='" + picstorage + picnum + ".png' onerror=\"javascript:this.src='http://miaoa.life-fun.cn/error.jpg'\" onclick='zoom(" + picnum +")' alt='' />";
+                            item3.appendChild(picbox);
+                            p_picnum = picnum;
+                            p_zan = picdata[num_cnt[cnt]].zan;
+                            num--;
+                        }
+                        ispost=false;
+                    },
+                    error: function() {
+                        ispost=false;
+                        alert("出错啦");
+                    }
+                });
+            }
+        });
+
+        var p_picnum_global = 1000000;
+        var p_zan_global = 1000000;
+        var p_picnum = p_picnum_global;
+        var p_zan = p_zan_global;
+        var limit = 24;
+        var rank_mode=1;
+
+        function changerank(rank_mode_t) {
+            if(ispost)
+            {
+                return;
+            }
+            ispost=true;
+
+            var main = document.getElementById("main");
+            var ranknew = document.getElementById("new");
+            var rankrank = document.getElementById("rank");
+
+            if(rank_mode_t==1)
+            {
+                rank_mode=1;
+                ranknew.style.cssText = "background-color:white;color: black; ";
+                rankrank.style.cssText = "background-color:;color: white; ";
+            }else{
+                rank_mode=2;
+                ranknew.style.cssText  = " background-color:;color: white;";
+                rankrank.style.cssText = "background-color:white;color: black;  ";
+            }
+
+            main.innerHTML = "<h5>加载中，请稍候哟~ 〣( ºΔº )〣</h5>";
+            p_picnum = p_picnum_global;
+            p_zan = p_zan_global;
+            piclength = 0;
+            num_cnt = new Array();
+
+            $.ajax({
+                type: 'GET',
+                url: "getpic.php",
+                data: {
+                    rank_mode: rank_mode,
+                    p_picnum: p_picnum,
+                    p_zan: p_zan,
+                    limit: 12
+                },
+                success: function(data) {
+                    //接受返回的数据
+                    picdata = eval("(" + data + ")");
+                    // alert(picdata.name.n1);
+                    for (var o in picdata) {
+                        piclength++;
+                        num_cnt.push(o);
+                    }
+                    num = piclength;
+                    main.innerHTML = "";
+                    for (var i = 0; num > 0; i++) {
+                        if (i % 3 == 0) {
+                            var item3 = document.createElement("div");
+                            item3.className = "item3";
+                            main.appendChild(item3);
+                        }
+                        var cnt = 12 - num;
+                        var picnum = num_cnt[cnt].replace("n", "");
+                        var picbox = document.createElement("div");
+                        picbox.className = "picbox";
+                        picbox.innerHTML = "<p>NO.<strong>" + picnum + "</strong>&nbsp;&nbsp;&nbsp;赞:<strong><span id='zan" + picnum + "'>" + picdata[num_cnt[cnt]].zan + "</span></strong></p>";
+                        picbox.innerHTML += "<p>作者:<strong><span id='name" + picnum + "'>" + picdata[num_cnt[cnt]].name + "</span></strong></p>";
+                        picbox.innerHTML += "<img id='pic" + picnum + "' class='pic' src='" + picstorage + picnum + ".png' onerror=\"javascript:this.src='http://miaoa.life-fun.cn/error.jpg'\" onclick='zoom(" + picnum +")' alt='' />";
+                        item3.appendChild(picbox);
+                        p_picnum = picnum;
+                        p_zan = picdata[num_cnt[cnt]].zan;
+                        num--;
+                    }
+                    ispost=false;
+                },
+                error: function() {
+                    ispost=false;
+                    alert("出错啦");
+                }
+            });
+        }
+
+        var lock = false;
+        function SubmitComment()
+        {
+            if (lock) {return;}
+            lock = true;
+            var conment = $("#type-box").val();
+            if(conment==""||conment==null)
+                return ;
+            var picnum = gfile;
+            var postid = getCookie("picnum");
+            // alert(conment);
+            $.ajax({
+                type: 'post',
+                url: "/function/postconment.php",
+                data: {
+                    picnum:picnum,
+                    postid:postid,
+                    postconment:conment
+                },
+                success: function(data) {
+                    if(data.indexOf("error")<0)
+                    {
+                        TINY.box.show({html:"吐槽成功!",animate:false,boxid:"messege",autohide:1});
+                        zooms(picnum);
+                        lock = false;
+                    }
+                    else if(data=="error1")
+                    {
+                        lock = false;
+                        TINY.box.show({html:"抱歉，提交作品才能吐槽噢",animate:false,boxid:"messege",autohide:4});
+                    }
+                    window.scrollTo(0, $(window).scrollTop()+1);
+                    lock = false;
+                },
+                error: function() {
+                    alert("出错啦");
+                    lock = false;
+                }
+            });
+        }
+
+        function GetConment(picnum)
+        {
+            $.ajax({
+                type: 'GET',
+                url: "/function/getconment.php",
+                data: {
+                    picnum: picnum
+                },
+                dataType:'json',
+                success: function(data) {
+                    if(data.noconment)
+                    {
+                        $("#conment-box").append("<p>这都没人吐槽？</p>");
+                        myScroll.scrollTo(0,0);
+                        myScroll.refresh();
+                        return ;
+                    }
+                    for (var o in data) {
+                        if(data[o].postid == picnum)
+                            $("#conment-box").append("<p><span>"+data[o].postname+"</span>："+data[o].postconment+"</p>");
+                        else if(data[o].postid==-10)
+                            $("#conment-box").append("<p><span style='color:green;'>"+data[o].postname+"</span>："+data[o].postconment+"</p>");
+                        else $("#conment-box").append("<p><span>"+data[o].postname+"</span>："+data[o].postconment+"</p>");
+                        myScroll.refresh();
+                    }
+                },
+                error: function() {
+                    alert("出错啦");
+                }
+            });
+        }
+
+        function searchpic()
+        {
+            // alert("h");
+            window.scrollTo(0, $(window).scrollTop()+1);
+            zooms($("#search-box").val());
+            TINY.box.show({html:"<div class='messege_content'>正在查询</div>",boxid:"messege",animate:false,autohide:1});
+        }
+    </script>
+    <title>十万喵星人计划！</title>
+</head>
+<body>
+<div id="toptips" width="100%">
+    <img src="/image/sharehand.gif" />
+</div>
+<div id="righttips" width="100%"><img src="http://miaoa.life-fun.cn/image/righttips.png" ></div>
+<div class="header">
+    <div id="tip" width="100%">
+        <a href="http://mp.weixin.qq.com/s?__biz=MzA4NTA3NTMzMA==&mid=200956868&idx=1&sn=a7ba3cbbb174faa13a34fe5289b89ae6%23rd"><img src="http://miaoa.life-fun.cn/image/BANNER-animation.gif" height="250px"></a>
+    </div>
+    <div id="rankmode" width="100%">
+        <a onclick="changerank(1)" class="button_wrap" ><div id="new" class="button">NEW 新鲜榜</div></a>
+        <a onclick="changerank(2)" class="button_wrap" ><div id="rank" class="button">RANK 喵神榜</div></a>
+    </div>
+</div>
+<div id="huise">
+    <div id="card">
+        <div id="cardcard">
+            <h1><strong>十万喵星人计划</strong></h1>
+            <img id="bigpic"  width="80%">
+            <h2 id="biginfo"></h2>
+            <br>
+            <div class="tri"> </div>
+            <div id="conment-box">
+            </div>
+            <p>&nbsp;</p>
+        </div>
+    </div>
+    <div id="menu-2">
+        <div id="pinglun-btn" class="button2 button_wrap" >吐槽</div>
+        <div id="zan-btn" class="button2 button_wrap">点赞</div>
+        <div id="close-btn" class="button2 button_wrap">关闭</div>
+    </div>
+</div>
+<div class="container" id="main"></div>
+<div id="jiazai">
+    <img src="http://miaoa.life-fun.cn/image/loading.gif" height="40px">
+    <div id="big">  </div>
+</div>
+<div id="menu">
+    <a onclick="showmine()" class="button_wrap" ><div id="zuopin" class="button">我的作品</div></a>
+    <img id="searchconfirm" src="http://miaoa.life-fun.cn/image/search.png" >
+    <a href="index.php" class="button_wrap" ><div id="huahua" class="button">我还要画</div></a>
+</div>
+<script type="text/javascript" src="/script/main.js?v=0.2"></script>
+<script type="text/javascript">
+    //官方分享接口
+    wx.ready(function(){
+        wx.onMenuShareAppMessage({
+            title: DataReload?new_title:wxSharedData.title,
+            desc: wxSharedData.desc,
+            link: DataReload?new_link:wxSharedData.link,
+            imgUrl: DataReload?new_imgUrl:wxSharedData.imgUrl,
+            trigger: function (res) {
+                //alert('用户点击发送给朋友');
+            },
+            success: function (res) {
+                //alert('已分享');
+                $.ajax({
+                    type: "post",
+                    url: "function/sharedata.php",
+                    data: {
+                        picnum: getCookie("picnum")>0?getCookie("picnum"):-1,
+                        mode:2,
+                        IndexOrPiclist:page_no,
+                        targetpic:gfile
+                    }
+                });
+                DataReload = false;//关闭数据重载
+            },
+            cancel: function (res) {
+                //alert('已取消');
+            },
+            fail: function (res) {
+                //alert(JSON.stringify(res));
+            }
+        });
+        wx.onMenuShareTimeline({
+            title: DataReload?new_title:wxSharedData.title,
+            desc: wxSharedData.desc,
+            link: DataReload?new_link:wxSharedData.link,
+            imgUrl: DataReload?new_imgUrl:wxSharedData.imgUrl,
+            trigger: function (res) {
+                //alert('用户点击分享到朋友圈');
+            },
+            success: function (res) {
+                //alert('已分享');
+                $.ajax({
+                    type: "post",
+                    url: "function/sharedata.php",
+                    data: {
+                        picnum: getCookie("picnum")>0?getCookie("picnum"):-1,
+                        mode:1,
+                        IndexOrPiclist:page_no,
+                        targetpic:gfile
+                    }
+                });
+                DataReload = false;//关闭数据重载
+            },
+            cancel: function (res) {
+                //alert('已取消');
+            },
+            fail: function (res) {
+                //alert(JSON.stringify(res));
+            }
+        });
+    });
+</script>
+</body>
+</html>
